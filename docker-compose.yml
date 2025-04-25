@@ -1,0 +1,24 @@
+# docker-compose.yml
+
+services:
+  bpmn-generator:
+    build: .
+    container_name: bpmn-generator
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - /home/user/Mistral-7B-Instruct-v0.3:/models/mistral
+      - ./app:/app
+      - .env:/app/.env
+    working_dir: /app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ gpu ]
